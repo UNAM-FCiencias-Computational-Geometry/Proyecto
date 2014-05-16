@@ -9,7 +9,7 @@
 #
 #    compile: Compila para su uso con ruby-processing
 #    compile_c: Compila para poder usar y probar tus funciones en ./main
-#    test: Ejecuta las pruebas(si no esta compilado, seguramente truena 
+#    test: Ejecuta las pruebas(si no esta compilado, seguramente truena
 #          esta accion)
 #    clean: Borra todos los archivos que se generaron en la instalación
 
@@ -17,15 +17,15 @@
 # Compilador que se usa
 @cc = "gcc"
 
-# Aqui debes agregar los demás objectos que programes ejemplo : 
+# Aqui debes agregar los demás objectos que programes ejemplo :
 # [ ..., "algorithms/heap.o"  ,...]
-@objs = ["double_linked_list/double_linked_list.o","points/2d_points.o"] + 
-  ["half_edge/half_edge.o","equations/equations.o" ,"face/face.o"] + 
+@objs = ["double_linked_list/double_linked_list.o","points/2d_points.o"] +
+  ["half_edge/half_edge.o","equations/equations.o" ,"face/face.o"] +
   ["dcel/dcel.o","voronoi/voronoi.o", "algorithms/algorithms.o"] +
   ["tests/voronoi_tests.o"]
 
 @cflags = "-I."
-@debug = "-g"
+@debug = "-Wall -Werror -g"
 @main = "main.o"
 
 #Variables de compile
@@ -33,7 +33,7 @@
 
 @lib_dir = "lib/"
 
-# Detecta que sistema operativo utilizas, solo soporta: 
+# Detecta que sistema operativo utilizas, solo soporta:
 #          - MACOSX
 #          - Linux
 
@@ -71,9 +71,9 @@ def compile_c
     " #{@cflags} -lm"
   puts "\t"+ command
   puts "No compilo de forma correcta" if not(system(command))
-end	
+end
 
-# Compila el codigo de tal forma que se puedan usar las librerias en 
+# Compila el codigo de tal forma que se puedan usar las librerias en
 # Ruby-Processing y los tests
 def compile
   puts "Compilando archivos fuentes:"
@@ -82,24 +82,24 @@ def compile
     puts "\t"+ command
     exit (0) if not((system(command)))
   end
-  
+
   puts "Convirtiendo a bibliotecas dinamicas"
   system("mkdir lib")
   @shared.each do |obj|
     library = obj.split('/').last
     compiled_libraries = `ls #{@lib_dir}`.split(" ")
-    
+
     libs = compiled_libraries.inject("") {
       |string,lib|
       string += "-l#{lib[3...-3]} "
     }
-    
+
     if (@so == "linux")
       command = "#{@cc} -shared -o lib/lib#{library} #{obj[0..-3] + "o"}" +
                 " -L#{@lib_dir} #{libs}"
     elsif (@so == "mac")
       command = "#{@cc} -shared -o lib/lib#{library} #{obj[0..-3] + "o"}" +
-                " -L#{@lib_dir} #{libs}" 
+                " -L#{@lib_dir} #{libs}"
     end
     puts "\t" + command
     puts "No compilo de forma correcta" if not((system(command)))
@@ -115,7 +115,7 @@ end
 # Borra todos los archivos generados por compile y compile_c
 def clean
   puts "Borramos los archivos *.o"
-  
+
   command = "rm #{(@objs + [@main]).join(" ")}"
   puts "\t" + command
   system(command)
@@ -126,7 +126,7 @@ def clean
   system(command)
 
   puts "Borramos todos los archivos .so"
-  
+
   command = "rm lib/*"
   puts "\t" + command
   system(command)
@@ -136,7 +136,7 @@ end
 #
 # Ejecutan todos los comandos que se le enviaron
 #
-ARGV.each do 
+ARGV.each do
   |action|
   send(action)
 end
