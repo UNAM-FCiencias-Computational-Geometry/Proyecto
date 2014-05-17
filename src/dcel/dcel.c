@@ -4,7 +4,9 @@
  */
 
 #include "dcel/dcel.h"
+
 #include "double_linked_list/double_linked_list.h"
+#include "red_black_tree/rb_tree.h"
 
 #include <stdio.h>
 #include <stdlib.h>
