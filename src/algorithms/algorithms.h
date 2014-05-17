@@ -14,6 +14,7 @@
 
 #include "voronoi/voronoi.h"
 
+#include <stdio.h>
 /**
  * upgrade_data contiene toda la información que necesita la
  * funcion upgrade_voronoi_diagram() para actualizar la DCEL.
