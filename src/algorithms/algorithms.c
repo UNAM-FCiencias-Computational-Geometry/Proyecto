@@ -248,7 +248,7 @@ voronoi* process_incremental(double width, double height, list* vertices)
 
 	FILE * fp;
 
-	fp = fopen ("salida.txt", "w");
+	fp = fopen (VORONOI_OUTPUT, "w");
 
 	voronoi* voronoi = init_voronoi_diagram(width, height);
 
@@ -271,4 +271,9 @@ voronoi* process_incremental(double width, double height, list* vertices)
 	fclose(fp);
 
 	return voronoi;
+}
+
+void process_delauney(voronoi* voronoi)
+{
+
 }

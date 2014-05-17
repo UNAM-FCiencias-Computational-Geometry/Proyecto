@@ -9,23 +9,24 @@
 #ifndef ALGORITHMS_H_
 #define ALGORITHMS_H_
 
+#define VORONOI_OUTPUT "voronoi.txt"
+#define DELAUNEY_OUTPUT "delauney.txt"
+
 #include "voronoi/voronoi.h"
 
-#include <stdio.h>
-
 /**
- * upgrade_data contiene toda la información que necesita la 
+ * upgrade_data contiene toda la información que necesita la
  * funcion upgrade_voronoi_diagram() para actualizar la DCEL.
  */
 struct upgrade_data {
-	
+
 	/**
 	 * center: Es la última semilla que se agregado a la lista seeds de
-	 *         la estructura voronoi, dicho de otra forma, 
+	 *         la estructura voronoi, dicho de otra forma,
 	 *         center = voronoi->seeds->tail->element;
 	 */
 	vertex* center;
-	
+
 	/**
 	 * Cuando trazamos el bisector perpendicular de la cara que estamos procesando
 	 * ocurrent 2 posibles casos.
@@ -33,27 +34,27 @@ struct upgrade_data {
 	 *  1. Si la nueva semilla no pertenece a ningun centroide, entonces las
 	 *     dos intersecciones del bisector perpendicular de la semilla y del
 	 *     centro de la cara donde cae son puntos que no estan en la DCEL.
-	 *  
-	 *  2. Si la nueva semilla pertenece a una cara, entonces las dos 
+	 *
+	 *  2. Si la nueva semilla pertenece a una cara, entonces las dos
 	 *     intersecciones del bisector perpendicular del centroide de la cara
 	 *     que se esta procesando y la nueva semilla se repiten una o dos veces
 	 *     en la lista de vertices de la DCEL.
 	 *
-	 *      
-	 * NOTA: intersection_a es un punto contenido en la arista a, lo mismo con 
+	 *
+	 * NOTA: intersection_a es un punto contenido en la arista a, lo mismo con
 	 *       la arista b y la intersecion_b.
 	 */
 	half_edge* a;
 	vertex* intersection_a;
-	
+
 	half_edge* b;
 	vertex* intersection_b;
-	
+
 	/**
 	 * voronoi es el diagrama que se esta procesando.
 	 */
 	voronoi* voronoi;
-	
+
 	/**
 	 * Es un booleano que nos indica si alguna de las dos interseciones de arriba
 	 * ya existen en la DCEL.
@@ -112,15 +113,22 @@ face* add_new_face(half_edge* a, half_edge* b, vertex* seed,
 void merge_faces(face* original_face, face* new_face, dcel* diagram);
 
 /**
- * Funcion que agrega los cambios que se re requiran a la cara que se esta 
+ * Funcion que agrega los cambios que se re requiran a la cara que se esta
  * procesando.
  */
 void upgrade_voronoi_diagram(up_data* data);
 
 /**
- * Estas funciones procesan los puntos y escriben el resultado en el archivo
- * salida.txt
+ * Estas funciones procesan los puntos crean un diagrama de voronoi
+ * y escriben el resultado en el archivo voronoi.txt
  */
 void write_voronoi(voronoi* voronoi, FILE* fp);
 voronoi* process_incremental(double width, double height, list* vertices);
+
+/**
+ * Esta funcion procesa el diagrama de voronoi para sacar las aristas de
+ * la triangulación de delauney y escribe el resultado en el archivo
+ * delauney.txt
+ */
+void process_delauney(voronoi* voronoi);
 #endif

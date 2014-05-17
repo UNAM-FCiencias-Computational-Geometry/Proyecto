@@ -15,7 +15,7 @@ dcel* init_dcel()
 {
 	dcel* dcel;
 	dcel = (struct dcel*) malloc(sizeof(struct dcel));
-	
+
 	if (dcel == NULL) {
 		printf("Ya no hay memoria disponible: init_dcel()\n");
 		exit(EXIT_FAILURE);
@@ -67,7 +67,7 @@ void dcel_insert_vertex(dcel* dcel, vertex* vertex)
 
 	if (dcel->vertex == NULL)
 		dcel->vertex = init_double_linked_list(POINT);
-	
+
 	push_back(dcel->vertex,vertex);
 }
 
@@ -94,17 +94,17 @@ void dcel_pop_vertex(dcel* dcel, vertex* vertex)
 			/** Si borro la cabeza*/
 			if (tmp == dcel->vertex->head) {
 
-				dcel->vertex->head = tmp->right;				
+				dcel->vertex->head = tmp->right;
 				dcel->vertex->head->left = NULL;
 
 				dcel->vertex->size -= 1;
 
 				return;
 			}
-				
+
 			/** Si borro el ultimo element*/
 			if (tmp == dcel->vertex->tail) {
-				
+
 				dcel->vertex->tail = tmp->left;
 				dcel->vertex->tail->right = NULL;
 
@@ -123,7 +123,7 @@ void dcel_pop_vertex(dcel* dcel, vertex* vertex)
 	}
 
 	return;
-	
+
 	printf("No se encontro el vertice en la DCEL: (%f,%f)\n", vertex->x,
 		   vertex->y);
 
@@ -131,17 +131,17 @@ void dcel_pop_vertex(dcel* dcel, vertex* vertex)
 	list* points = dcel->vertex;
 	item* tmps;
 
-	
+
 	printf("Size: %d\n", points->size);
 
 	for(tmps = points->head; tmps != NULL; tmps = tmps->right) {
 		struct point *temp = tmps->element;
-		
+
 		printf("(%f,%f)\n", temp->x, temp->y);
-		
+
 	}
-	
-	
+
+
 	exit(EXIT_FAILURE);
 }
 
@@ -168,17 +168,17 @@ void dcel_pop_half_edge(dcel* dcel,half_edge* half_edge)
 			/** Si borro la cabeza*/
 			if (tmp == dcel->half_edge->head) {
 
-				dcel->half_edge->head = tmp->right;				
+				dcel->half_edge->head = tmp->right;
 				dcel->half_edge->head->left = NULL;
 
 				dcel->half_edge->size -= 1;
 
 				return;
 			}
-				
+
 			/** Si borro el ultimo element*/
 			if (tmp == dcel->half_edge->tail) {
-				
+
 				dcel->half_edge->tail = tmp->left;
 				dcel->half_edge->tail->right = NULL;
 
@@ -196,7 +196,7 @@ void dcel_pop_half_edge(dcel* dcel,half_edge* half_edge)
 		}
 	}
 
-	printf("No se encontro la arista en la DCEL: (%f,%f) (%f,%f) \n", 
+	printf("No se encontro la arista en la DCEL: (%f,%f) (%f,%f) \n",
 		   half_edge->first->x, half_edge->first->y, half_edge->last->x,
 		   half_edge->last->y);
 	exit(EXIT_FAILURE);
@@ -227,17 +227,17 @@ void dcel_pop_face(dcel* dcel, face* face)
 			/** Si borro la cabeza*/
 			if (tmp == dcel->face->head) {
 
-				dcel->face->head = tmp->right;				
+				dcel->face->head = tmp->right;
 				dcel->face->head->left = NULL;
 
 				dcel->face->size -= 1;
 
 				return;
 			}
-				
+
 			/** Si borro el ultimo element*/
 			if (tmp == dcel->face->tail) {
-				
+
 				dcel->face->tail = tmp->left;
 				dcel->face->tail->right = NULL;
 
@@ -257,12 +257,12 @@ void dcel_pop_face(dcel* dcel, face* face)
 
 	printf("No se encontro la cara en la DCEL: %s \n", face->name);
 	exit(EXIT_FAILURE);
-	
+
 }
 
 
 list* incident_he_to_v(vertex* vertex)
-{	
+{
 	list* list = init_double_linked_list(HALF_EDGE);
 
 	push_back(list, vertex->incident_edge);
@@ -277,9 +277,37 @@ list* incident_he_to_v(vertex* vertex)
 	return list;
 }
 
-list* incident_f_to_f(face* face) 
+list* incident_f_to_f(face* face)
 {
-	return NULL;
+	rb_tree* incident_faces;
+	incident_faces = init_rb_tree(FACE);
+
+	if (face->outer_component != NULL) {
+
+		half_edge* init_half_edge = face->outer_component;
+		half_edge* tmp;
+
+		struct face* face_tmp = init_half_edge->twin->incident_face;
+
+		if (face_tmp->outer_component != NULL)
+			rb_insert(incident_faces, face_tmp);
+
+
+		for(tmp = init_half_edge->next; tmp != init_half_edge; tmp = tmp->next) {
+
+			face_tmp = tmp->twin->incident_face;
+
+			if (face_tmp->outer_component != NULL) {
+				if (rb_search(incident_faces, face_tmp) == NULL)
+					rb_insert(incident_faces,face_tmp);
+			}
+		}
+	}
+
+	list* faces = rb_tree_to_list(incident_faces);
+	destroy_rb_tree(incident_faces);
+
+	return faces;
 }
 
 list* incident_he_to_f(face* face)
@@ -295,7 +323,7 @@ list* incident_he_to_f(face* face)
 
 		push_back(list,init_half_edge);
 
-		for (tmp = init_half_edge->next; tmp != init_half_edge; 
+		for (tmp = init_half_edge->next; tmp != init_half_edge;
 			 tmp = tmp->next) {
 
 			push_back(list, tmp);
@@ -310,7 +338,7 @@ list* incident_he_to_f(face* face)
 	}
 
 	if (face->inner_components != NULL) {
-		
+
 		item* tmp1 = ((struct double_linked_list*) face->inner_components)->head;
 		half_edge *init_half_edge, *tmp2;
 
@@ -337,24 +365,24 @@ int contain_vertex(face* face, vertex* vertex)
 {
 
 	printf("Contain_vertex(), (%f,%f)\n", vertex->x, vertex->y);
-	
+
 	list* incident_he = incident_he_to_f(face);
 
 	int direction = LEFT;
 
 	item *tmp;
 
-	
+
 	for (tmp = incident_he->head; tmp != NULL; tmp = tmp->right) {
-		
+
 
 		half_edge* tmp_he = tmp->element;
-		
+
 
 		printf("Arista: (%f,%f), (%f,%f)\n", tmp_he->first->x, tmp_he->first->y,
 			   tmp_he->last->x, tmp_he->last->y);
 
-		
+
 
 		if (curve_orientation(tmp_he->first, tmp_he->last, vertex) != LEFT) {
 			direction = RIGHT;
@@ -367,18 +395,18 @@ int contain_vertex(face* face, vertex* vertex)
 		return TRUE;
 
 	for (tmp = incident_he->head; tmp != NULL; tmp = tmp->right) {
-		
+
 		half_edge* tmp_he = tmp->element;
-		
+
 		if (curve_orientation(tmp_he->first, tmp_he->last, vertex) != RIGHT) {
 			direction = LEFT;
 			break;
 		}
 	}
-	
+
 	if (direction == RIGHT)
 		return TRUE;
-	
+
 	return FALSE;
 }
 
@@ -390,9 +418,9 @@ vertex* search_vertex(dcel* dcel, vertex* vertex)
 	item* tmp;
 	struct point* tmp_v;
 	for(tmp = dcel->vertex->head; tmp != NULL; tmp = tmp->right) {
-		
+
 		tmp_v = tmp->element;
-		
+
 		if (point_equals(tmp_v, vertex))
 			return tmp_v;
 	}

@@ -27,11 +27,11 @@ def setup
   puts ""
 
   points = random_vertex.map do
-    |x| 
+    |x|
     Points.init_point(x[0], x[1], "")
   end
-  
-  
+
+
   list = List.init_double_linked_list(:point)
 
   points.each do
@@ -39,22 +39,39 @@ def setup
     List.push_back(list, point)
   end
 
-  Algorithms.process_incremental(width, height, list)
+  voronoi = Algorithms.process_incremental(width, height, list)
+
+  Algorithms.process_delauney(voronoi)
 
   read
 
-  @index = 0
-  
+  @index = -1
+
   @up = false
- 
+
 end
 
 def draw
   if key_pressed?
+
     if @up
-      translate(0, height)
-      draw_vertex_and_half_edges
-      @index += 1
+
+      if (key == "\n" or key == "\b")
+
+        @index += 1 if (key == "\n" and (@index + 1) < @voronoi.size)
+
+        @index -= 1  if (key == "\b" and @index >= 1)
+
+
+        translate(0, height)
+        draw_voronoi
+      end
+
+      if (key == " ")
+        translate(0, height)
+        draw_delauney
+      end
+
       @up = false
     else
       @up = true
@@ -62,18 +79,22 @@ def draw
   end
 end
 
-# Public: Metodo que dibuja las aristas y los vertices guardados en el arreglo
-#         @process
+# Public: Metodo que dibuja las aristas y los vertices guardados en la estructura
+#         que usaron en read
 #
-# Esta funcion la debes de modificar para que dibuje los puntos y aristas
-def draw_vertex_and_half_edges
-  
+# Este metodo lo debes de modificar para que dibuje los puntos y aristas
+def draw_voronoi
 end
 
-# Public: Metodo que lee el archivo salida.txt y la guarda en una variable 
+# Public: Metodo que dibuja las aristas y los vertices guardados en la estructura
+#         que usaron en read
+#
+# Este metodo lo debes de modificar para que dibuje los puntos y aristas
+def draw_delauney
+end
+
+# Public: Metodo que lee el archivo salida.txt y la guarda en una variable
 #         de instancia. (Les recomiendo usar las clases Array y Hash.)
 #
-def read()
-  
-  
+def read
 end
